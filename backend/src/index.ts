@@ -5,8 +5,11 @@ import { GameManager } from "./GameManager";
 
 const wss = new WebSocketServer({ port: 8080 });
 
-const GameManager: any = new GameManager(wss);
 wss.on('connection', function connection(ws) {
+    const gameManager = new GameManager(ws);
+    ws.on("open", () => {
+        gameManager.
+    })
     ws.on('error', console.error);
 
 

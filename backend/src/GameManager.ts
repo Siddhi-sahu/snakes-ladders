@@ -10,25 +10,40 @@ import { INIT_GAME } from "./messages";
 export class GameManager {
     public player;
     public pendingUser: WebSocket | null;
-    public GAMES = [];
+    private GAMES: any;
+    public users: any;
     constructor(socket: WebSocket) {
         this.player = socket;
         this.pendingUser = null;
+        //Games array contains all games instances
+        this.GAMES = [];
+        this.users = [];
+        //called automatically when a new connection joins
         this.init(socket);
 
     };
 
-    //Games array contains all games instances
+
+    addUser(socket: WebSocket) {
+        this.users.push(socket);
+    }
+
+    UserRemover() {
+        this.users = this.users.filter()
+    }
 
 
     init(socket: WebSocket) {
+
         if (this.pendingUser) {
-            const game = new Game(socket, this.pendingUser);
             //start the game
+            const game = new Game(socket, this.pendingUser);
+
+            if (game) {
+                this.GAMES.push(game)
+            }
+
             //emit init game message
-
-            // this.GAMES.push(game)
-
             socket.emit(JSON.stringify({
                 type: INIT_GAME
             }));
@@ -38,6 +53,12 @@ export class GameManager {
         } else {
             this.pendingUser = this.player;
         }
+    }
+
+    //handler which we would need to call
+
+    handlers() {
+
     }
 
 }
