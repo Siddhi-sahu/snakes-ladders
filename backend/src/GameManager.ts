@@ -8,12 +8,10 @@ import { INIT_GAME } from "./messages";
 //Every time a new GameManager is created a new instance of the class is made but the static variables (like pendingUser) persist across all instances.
 //  this.pendingUser is shared among all incoming users because it is not local to the constructor
 export class GameManager {
-    public player;
     private pendingUser: WebSocket | null;
     private GAMES: any;
     private users: any;
-    constructor(socket: WebSocket) {
-        this.player = socket;
+    constructor() {
         this.pendingUser = null;
         //Games array contains all games instances
         this.GAMES = [];
@@ -29,7 +27,7 @@ export class GameManager {
         this.initHandlers(socket);
     }
 
-    UserRemover(socket: WebSocket) {
+    userRemover(socket: WebSocket) {
         this.users = this.users.filter((user: any) => user !== socket);
         console.log(this.users.length)
 
@@ -77,7 +75,7 @@ export class GameManager {
                 } else {
                     try {
 
-                        this.pendingUser = this.player;
+                        this.pendingUser = socket;
                         console.log("pensding user is created")
                     } catch (e) {
                         console.log("pensding user is not created", e)
