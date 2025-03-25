@@ -2,7 +2,7 @@
 
 import { WebSocket } from "ws";
 import { Game } from "./Game";
-import { INIT_GAME } from "./messages";
+import { DICE, INIT_GAME } from "./messages";
 
 //two player will get 2 different game class? first pU = null then a user joins and 
 //Every time a new GameManager is created a new instance of the class is made but the static variables (like pendingUser) persist across all instances.
@@ -49,7 +49,7 @@ export class GameManager {
                     try {
                         console.log("both1")
 
-                        const game = new Game(socket, this.pendingUser);
+                        const game = new Game(this.pendingUser, socket);
                         console.log("both2")
 
 
@@ -83,6 +83,13 @@ export class GameManager {
                 }
 
             }
+            if (message.type === DICE) {
+                const game: Game = this.GAMES.find((GAME: Game) => GAME.player1 === socket || GAME.player2 === socket);
+
+                game.manageMoves(socket)
+
+            }
+
         }
 
 
