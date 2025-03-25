@@ -5,59 +5,88 @@ import { Game } from "./Game";
 import { INIT_GAME } from "./messages";
 
 //two player will get 2 different game class? first pU = null then a user joins and 
-//Every time a new GameManager is created, a new instance of the class is made but the static variables (like pendingUser) persist across all instances.
-// In this case, this.pendingUser is shared among all incoming users because it is not local to the constructor.
+//Every time a new GameManager is created a new instance of the class is made but the static variables (like pendingUser) persist across all instances.
+//  this.pendingUser is shared among all incoming users because it is not local to the constructor
 export class GameManager {
     public player;
-    public pendingUser: WebSocket | null;
+    private pendingUser: WebSocket | null;
     private GAMES: any;
-    public users: any;
+    private users: any;
     constructor(socket: WebSocket) {
         this.player = socket;
         this.pendingUser = null;
         //Games array contains all games instances
         this.GAMES = [];
         this.users = [];
-        //called automatically when a new connection joins
-        this.init(socket);
 
     };
 
 
     addUser(socket: WebSocket) {
         this.users.push(socket);
+        console.log("user length:,", this.users.length)
+        //called automatically when a new connection joins
+        this.initHandlers(socket);
     }
 
-    UserRemover() {
-        this.users = this.users.filter()
+    UserRemover(socket: WebSocket) {
+        this.users = this.users.filter((user: any) => user !== socket);
+        console.log(this.users.length)
+
     }
 
 
-    init(socket: WebSocket) {
+    initHandlers(socket: WebSocket) {
 
-        if (this.pendingUser) {
-            //start the game
-            const game = new Game(socket, this.pendingUser);
+        //pending user is not persisiting
 
-            if (game) {
-                this.GAMES.push(game)
+        socket.onmessage = (event: any) => {
+            const message = JSON.parse(event.data);
+            console.log("message", message)
+            if (message.type === INIT_GAME) {
+                if (this.pendingUser) {
+                    //start the game
+                    console.log("both5")
+
+                    try {
+                        console.log("both1")
+
+                        const game = new Game(socket, this.pendingUser);
+                        console.log("both2")
+
+
+                        if (game) {
+                            this.GAMES.push(game)
+                            console.log("both3")
+
+                        }
+
+                        //emit init game message
+                        // socket.send(JSON.stringify({
+                        //     type: INIT_GAME
+                        // }));
+
+                        this.pendingUser = null;
+                        console.log("both")
+
+                    } catch (e) {
+                        console.log("game is not created", e)
+                    }
+
+
+                } else {
+                    try {
+
+                        this.pendingUser = this.player;
+                        console.log("pensding user is created")
+                    } catch (e) {
+                        console.log("pensding user is not created", e)
+                    }
+                }
+
             }
-
-            //emit init game message
-            socket.emit(JSON.stringify({
-                type: INIT_GAME
-            }));
-
-            this.pendingUser = null;
-
-        } else {
-            this.pendingUser = this.player;
         }
-    }
 
-    //handler which we would need to call
-
-    handlers() {
 
     }
 
