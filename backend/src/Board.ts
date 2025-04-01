@@ -23,9 +23,22 @@ const SNAKES: Record<number, number> = {
     98: 78
 }
 
-
+//class or function
 export const Board = (position: number) => {
 
-    console.log(LADDERS[position]);
-    console.log(SNAKES[position])
+    //we need to update the values and send it to the main thing
+    if (LADDERS[position]) {
+        console.log("you are at", position)
+
+        console.log("ladderhere ; goes to ", LADDERS[position]);
+
+        //return new position else the postion remains the same
+    }
+
+    if (SNAKES[position]) {
+        console.log("you are at", position)
+
+        console.log("snake here ; goes to ", SNAKES[position])
+
+    }
 }

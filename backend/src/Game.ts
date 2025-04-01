@@ -1,6 +1,7 @@
 import { WebSocket } from "ws";
 import { DICE, INIT_GAME } from "./messages";
 import { BLUE, WHITE } from "./colors";
+import { Board } from "./Board";
 
 export class Game {
     public player1: WebSocket;
@@ -46,11 +47,13 @@ export class Game {
             //DRY :(
             try {
                 const value = Math.ceil(Math.random() * 6);
-                //check the position for ladders and snakes
                 this.whitePosition = this.whitePosition + value;
                 console.log("white position", this.whitePosition);
 
                 if (this.whitePosition < 100) {
+                    //check the position for ladders and snakes
+
+                    Board(this.whitePosition);
 
                     this.player1.send(JSON.stringify({
                         type: DICE,
@@ -91,22 +94,32 @@ export class Game {
                 this.bluePosition = this.bluePosition + value;
                 console.log("blue position", this.bluePosition);
 
-                this.player1.send(JSON.stringify({
-                    type: DICE,
-                    payload: {
-                        player: BLUE,
-                        diceValue: value,
-                        position: this.bluePosition
-                    }
-                }))
-                this.player2.send(JSON.stringify({
-                    type: DICE,
-                    payload: {
-                        player: BLUE,
-                        diceValue: value,
-                        position: this.bluePosition
-                    }
-                }));
+                if (this.bluePosition < 100) {
+                    Board(this.bluePosition);
+
+                    this.player1.send(JSON.stringify({
+                        type: DICE,
+                        payload: {
+                            player: BLUE,
+                            diceValue: value,
+                            position: this.bluePosition
+                        }
+                    }))
+                    this.player2.send(JSON.stringify({
+                        type: DICE,
+                        payload: {
+                            player: BLUE,
+                            diceValue: value,
+                            position: this.bluePosition
+                        }
+                    }));
+
+                } else if (this.bluePosition === 100) {
+                    console.log("blue wins");
+
+                } else {
+                    return;
+                }
 
                 this.moves = this.moves + 1;
 
