@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { DICE, INIT_GAME } from "./messages";
+import { DICE, GAME_OVER, INIT_GAME } from "./messages";
 import { BLUE, WHITE } from "./colors";
 import { Board } from "./Board";
 
@@ -47,13 +47,13 @@ export class Game {
             //DRY :(
             try {
                 const value = Math.ceil(Math.random() * 6);
-                this.whitePosition = this.whitePosition + value;
-                console.log("white position", this.whitePosition);
 
-                if (this.whitePosition < 100) {
+                if (this.whitePosition + value < 100) {
+                    this.whitePosition = this.whitePosition + value;
+                    console.log("white position", this.whitePosition);
                     //check the position for ladders and snakes
 
-                    Board(this.whitePosition);
+                    this.whitePosition = Board(this.whitePosition);
 
                     this.player1.send(JSON.stringify({
                         type: DICE,
@@ -72,10 +72,39 @@ export class Game {
                         }
                     }));
 
-                } else if (this.whitePosition === 100) {
-                    console.log("white wins");
+                } else if (this.whitePosition + value === 100) {
+                    console.log("white wins", value);
+                    this.player1.send(JSON.stringify({
+                        type: GAME_OVER,
+                        payload: {
+                            winner: "white"
+                        }
+                    }))
+                    this.player2.send(JSON.stringify({
+                        type: GAME_OVER,
+                        payload: {
+                            winner: "white"
+                        }
+                    }));
 
                 } else {
+                    //position should not update here
+                    this.player1.send(JSON.stringify({
+                        type: DICE,
+                        payload: {
+                            player: BLUE,
+                            diceValue: value,
+                            position: this.whitePosition
+                        }
+                    }))
+                    this.player2.send(JSON.stringify({
+                        type: DICE,
+                        payload: {
+                            player: BLUE,
+                            diceValue: value,
+                            position: this.whitePosition
+                        }
+                    }));
                     return;
                 }
 
@@ -91,11 +120,11 @@ export class Game {
         } else if (this.moves % 2 === 1 && socket == this.player2) {
             try {
                 const value = Math.ceil(Math.random() * 6);
-                this.bluePosition = this.bluePosition + value;
-                console.log("blue position", this.bluePosition);
 
-                if (this.bluePosition < 100) {
-                    Board(this.bluePosition);
+                if (this.bluePosition + value < 100) {
+                    this.bluePosition = this.bluePosition + value;
+                    console.log("blue position", this.bluePosition);
+                    this.bluePosition = Board(this.bluePosition);
 
                     this.player1.send(JSON.stringify({
                         type: DICE,
@@ -114,10 +143,40 @@ export class Game {
                         }
                     }));
 
-                } else if (this.bluePosition === 100) {
-                    console.log("blue wins");
+                } else if (this.bluePosition + value === 100) {
+                    console.log("blue wins", this.bluePosition + value);
+                    this.player1.send(JSON.stringify({
+                        type: GAME_OVER,
+                        payload: {
+                            winner: "blue"
+                        }
+                    }))
+                    this.player2.send(JSON.stringify({
+                        type: GAME_OVER,
+                        payload: {
+                            winner: "blue"
+                        }
+                    }));
 
                 } else {
+                    //position should not update here
+
+                    this.player1.send(JSON.stringify({
+                        type: DICE,
+                        payload: {
+                            player: BLUE,
+                            diceValue: value,
+                            position: this.bluePosition
+                        }
+                    }))
+                    this.player2.send(JSON.stringify({
+                        type: DICE,
+                        payload: {
+                            player: BLUE,
+                            diceValue: value,
+                            position: this.bluePosition
+                        }
+                    }));
                     return;
                 }
 
@@ -129,7 +188,8 @@ export class Game {
             }
 
         } else {
-            return
+
+            return;
         }
     }
 
