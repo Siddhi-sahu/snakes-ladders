@@ -87,6 +87,8 @@ export class Game {
                         }
                     }));
 
+                    return;
+
                 } else {
                     //position should not update here
                     this.player1.send(JSON.stringify({

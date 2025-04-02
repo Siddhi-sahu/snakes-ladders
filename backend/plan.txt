@@ -5,3 +5,6 @@ inmemory games objects with multiple games []
   assign different colors[✅]
   manageMoves[✅]
   board logic[✅]
+
+frontend[]
+  
