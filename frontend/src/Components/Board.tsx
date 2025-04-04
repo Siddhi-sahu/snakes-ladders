@@ -1,11 +1,30 @@
 export const Board = () => {
-
     //get things 
     //10 rows
     // 10 columns
     // 100 boxes
 
     // const board = 10;
+    const LADDERS: Record<number, number> = {
+        1: 38,
+        4: 14,
+        9: 31,
+        21: 42,
+        28: 84,
+        51: 67,
+        71: 91,
+        80: 99
+
+    }
+    const SNAKES: Record<number, number> = {
+        16: 6,
+        49: 11,
+        62: 19,
+        65: 53,
+        87: 24,
+        95: 75,
+        98: 78
+    }
     const board = [
         [91, 92, 93, 94, 95, 96, 97, 98, 99, 100],
         [81, 82, 83, 84, 85, 86, 87, 88, 89, 90],
@@ -21,26 +40,42 @@ export const Board = () => {
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     ];
 
+    // const checkCell = (cellNumber: number) => {
+    //     if (LADDERS[cellNumber]) {
+    //         return "🪜"
+    //     } else if (SNAKES[cellNumber]) {
+
+    //     }
+
+    // }
+
     return <div className="flex justify-center items-center bg-red-900  border-b-2">
 
-        <div className="bg-black mt-1.5">
+        <div className="bg-black mt-1.5 ">
+            <div>
 
-            {board.map((row, index) => (
-                //rows
-                <div className="flex justify-center items-center border-l-2 border-t-2  " key={index}>
+                {board.map((row, index) => (
+                    //rows
+                    <div className="flex justify-center items-center border-l-2 border-t-2  " key={index}>
 
-                    {row.map((cell, index) =>
-                        //individual cols
-                        <div key={index} className={` flex justify-center items-center border-r-2 w-16 h-16 ${cell % 2 === 0 ? "bg-green-400" : "bg-pink-400"}`} >
-                            <div className="text-white font-semibold">
+                        {row.map((cell, index) =>
+                            //individual cols
+                            <div key={index} className={` flex justify-center items-center border-r-2 w-16 h-16 ${cell % 2 === 0 ? "bg-yellow-400" : "bg-pink-400"}`} >
+                                <div className="text-white font-bold">
+                                    {LADDERS[cell] ? "🪜" : SNAKES[cell] ? "🐍" : cell}
+                                </div>
 
-                                {cell}
-                            </div>
+                            </div>)}
+                    </div>
 
-                        </div>)}
-                </div>
+                ))}
 
-            ))}
+            </div>
+
+
+        </div>
+        <div className="flex bg-white m-1">
+            dice
 
         </div>
     </div>
