@@ -49,7 +49,7 @@ export const Board = () => {
 
     // }
 
-    return <div className="flex justify-center items-center bg-red-900  border-b-2">
+    return <div className="flex justify-center items-center  border-b-2">
 
         <div className="bg-black mt-1.5 ">
             <div>
@@ -74,9 +74,9 @@ export const Board = () => {
 
 
         </div>
-        <div className="flex bg-white m-1">
+        {/* <div className="flex bg-white m-1">
             dice
 
-        </div>
+        </div> */}
     </div>
 }
