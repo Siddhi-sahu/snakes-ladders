@@ -87,6 +87,7 @@ export class Game {
                         }
                     }));
 
+                    console.log("return from game over")
                     return;
 
                 } else {
@@ -107,6 +108,7 @@ export class Game {
                             position: this.whitePosition
                         }
                     }));
+                    console.log("return from overflow")
                     return;
                 }
 

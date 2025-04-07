@@ -11,13 +11,16 @@ export const Landing = () => {
     const [clicked, setClicked] = useState(false);
     const [started, setStarted] = useState(false);
     const [diceValue, setDiceValue] = useState<number>(1);
-    const [player, setPlayer] = useState<"white" | "blue">("white");
-    const [whitePosition, setWhitePosition] = useState(1);
-    const [bluePosition, setBluePosition] = useState(1);
+    //each person color assign to them
+    const [color, setColor] = useState<"white" | "blue" | null>(null);
+    const [lastPlayed, setLastPlayed] = useState<"white" | null | "blue">(null);
+    // const [whitePosition, setWhitePosition] = useState(1);
+    // const [bluePosition, setBluePosition] = useState(1);
     const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
     const [diceFace, setDiceFace] = useState("⚀");
-    let moves = 0;
     const socket = useSocket();
+
+    //moves will eb handled on the backend, just need frontend to be passive
 
     useEffect(() => {
         if (!socket) return;
@@ -29,25 +32,22 @@ export const Landing = () => {
             switch (message.type) {
                 case INIT_GAME:
                     console.log("init");
+                    //immediate assign
                     const color = message.payload.color;
-                    console.log("COLOR", color);
+                    setColor(color);
                     setStarted(true);
                     break;
 
                 case DICE:
-                    moves += 1;
-                    console.log("moves", moves);
-                    setDiceValue(() => {
-                        const newDiceValue = message.payload.diceValue;
-                        return newDiceValue;
-                    });
-                    // console.log("diceValue", diceValue);
-                    setPlayer(() => {
-                        const newPlayer = message.payload.player;
-                        return newPlayer
-                    });
-                    console.log("player ", player)
+                    const value = message.payload.diceValue;
+                    //react donot update state immediatedly but stack them together to be updated ton the next rerender so dice value would be stale here
+                    setDiceValue(value);
 
+                    //last played player i need to update with the data i am sending from the backend
+                    setLastPlayed(message.payload.player);
+
+                    //i need to set dice face/value here?/ with no stale state
+                    setDiceFace(diceUnicode[value - 1])
 
                     break;
                 case GAME_OVER:
@@ -59,7 +59,6 @@ export const Landing = () => {
             }
 
         }
-
 
     }, [socket])
     const handleClick = () => {
@@ -74,54 +73,25 @@ export const Landing = () => {
 
     }
     const handleDiceClick = () => {
-        if (!socket) return;
-
-
-        if (moves % 2 === 0 && player === "white") {
-            console.log(" white clicked");
-            console.log(diceValue);
-
-            try {
-                socket.send(JSON.stringify({
-                    type: DICE
-                }))
-                setInterval(() => {
-                    setDiceFace(diceUnicode[diceValue - 1])
-
-                }, 500);
-
-
-            } catch (e) {
-                console.log("error in dice: ", e)
-            }
-
-        } else if (moves % 2 === 1 && player === "blue") {
-            console.log(" blue clicked");
-            console.log(diceValue);
-            try {
-                socket.send(JSON.stringify({
-                    type: DICE
-                }))
-                setInterval(() => {
-                    setDiceFace(diceUnicode[diceValue - 1])
-
-                }, 500);
-
-
-            } catch (e) {
-                console.log("error in dice: ", e)
-            }
-
-
-        } else {
+        if (!socket || color === lastPlayed) {
+            console.log("no socket during handlediceclick or not your turn")
             return;
         }
+
+        //just send a dice payload, no unnecessary checks
+
+        socket.send(JSON.stringify({
+            type: DICE
+        }))
 
     }
 
     //when the game start board should load
     //todo: dice should be emited to both the players[]
     //manage moves sequence[]
+    //button should be disabled when there is not that perons turn
+
+    const notYourTurn = color === null || color === lastPlayed;
     return <>
         {
             started ?
@@ -134,7 +104,9 @@ export const Landing = () => {
                         <div className="bg-red text-white text-9xl flex items-center justify-center">
                             {diceFace}
                         </div>
-                        <button onClick={handleDiceClick} className={`bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded`}>
+                        <button
+                            disabled={notYourTurn}
+                            onClick={handleDiceClick} className={`bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded`}>
 
                             Roll the dice
                         </button>
@@ -162,8 +134,6 @@ export const Landing = () => {
 
 
         }
-
-
 
     </>
 
