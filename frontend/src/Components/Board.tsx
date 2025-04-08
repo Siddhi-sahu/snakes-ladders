@@ -1,12 +1,21 @@
-export const Board = () => {
-    //get things 
-    //10 rows
-    // 10 columns
-    // 100 boxes
+import { useEffect, useState } from "react";
 
-    // const board = 10;
+type BoardProps = {
+    whitePosition: number;
+    bluePosition: number;
+
+}
+
+export const Board = ({ whitePosition, bluePosition }: BoardProps) => {
+    const [whiteToken, setWhiteToken] = useState(1);
+    const [blueToken, setBlueToken] = useState(1);
+
+    useEffect(() => {
+        setWhiteToken(whitePosition);
+        setBlueToken(bluePosition)
+
+    }, [whitePosition, bluePosition])
     const LADDERS: Record<number, number> = {
-        1: 38,
         4: 14,
         9: 31,
         21: 42,
@@ -40,14 +49,6 @@ export const Board = () => {
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     ];
 
-    // const checkCell = (cellNumber: number) => {
-    //     if (LADDERS[cellNumber]) {
-    //         return "🪜"
-    //     } else if (SNAKES[cellNumber]) {
-
-    //     }
-
-    // }
 
     return <div className="flex justify-center items-center  border-b-2">
 
@@ -60,9 +61,11 @@ export const Board = () => {
 
                         {row.map((cell, index) =>
                             //individual cols
-                            <div key={index} className={` flex justify-center items-center border-r-2 w-16 h-16 ${cell % 2 === 0 ? "bg-yellow-400" : "bg-pink-400"}`} >
+                            <div key={index} className={` flex  justify-center items-center border-r-2 w-16 h-16 ${cell % 2 === 0 ? "bg-yellow-500" : "bg-pink-500"}`} >
                                 <div className="text-white font-bold">
                                     {LADDERS[cell] ? "🪜" : SNAKES[cell] ? "🐍" : cell}
+                                    {whiteToken === cell ? "⚪" : ""}
+                                    {blueToken === cell ? "🔵" : ""}
                                 </div>
 
                             </div>)}

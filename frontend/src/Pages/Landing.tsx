@@ -10,17 +10,17 @@ export const GAME_OVER = "game_over";
 export const Landing = () => {
     const [clicked, setClicked] = useState(false);
     const [started, setStarted] = useState(false);
-    const [diceValue, setDiceValue] = useState<number>(1);
+    // const [diceValue, setDiceValue] = useState<number>(1);
     //each person color assign to them
     const [color, setColor] = useState<"white" | "blue" | null>(null);
     const [lastPlayed, setLastPlayed] = useState<"white" | null | "blue">(null);
-    // const [whitePosition, setWhitePosition] = useState(1);
-    // const [bluePosition, setBluePosition] = useState(1);
+    const [whitePosition, setWhitePosition] = useState<number>(1);
+    const [bluePosition, setBluePosition] = useState<number>(1);
     const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
     const [diceFace, setDiceFace] = useState("⚀");
+    const [winner, setWinner] = useState<null | "white" | "blue">(null);
+    const [currentTurn, setCurrentTurn] = useState<"white" | "blue">("white");
     const socket = useSocket();
-
-    //moves will eb handled on the backend, just need frontend to be passive
 
     useEffect(() => {
         if (!socket) return;
@@ -32,7 +32,6 @@ export const Landing = () => {
             switch (message.type) {
                 case INIT_GAME:
                     console.log("init");
-                    //immediate assign
                     const color = message.payload.color;
                     setColor(color);
                     setStarted(true);
@@ -40,18 +39,34 @@ export const Landing = () => {
 
                 case DICE:
                     const value = message.payload.diceValue;
+                    const position = message.payload.position;
+                    const player = message.payload.player;
                     //react donot update state immediatedly but stack them together to be updated ton the next rerender so dice value would be stale here
-                    setDiceValue(value);
-
-                    //last played player i need to update with the data i am sending from the backend
-                    setLastPlayed(message.payload.player);
-
+                    // setDiceValue(value);
+                    setLastPlayed(player);
                     //i need to set dice face/value here?/ with no stale state
                     setDiceFace(diceUnicode[value - 1])
 
+                    if (player === "white") {
+                        setWhitePosition(position);
+                        setCurrentTurn("blue")
+                    } else {
+                        setBluePosition(position);
+                        setCurrentTurn("white")
+                    }
+
+
                     break;
                 case GAME_OVER:
-                    console.log("dice");
+                    console.log("game over");
+                    const winnerr = message.payload.winner;
+                    setWinner(winnerr);
+                    if (winnerr === "white") {
+
+                        setWhitePosition(100)
+                    } else {
+                        setBluePosition(100)
+                    }
                     break;
 
                 default:
@@ -91,33 +106,53 @@ export const Landing = () => {
     //manage moves sequence[]
     //button should be disabled when there is not that perons turn
 
-    const notYourTurn = color === null || color === lastPlayed;
+    const yourTurn = color !== null && color !== lastPlayed;
+    // const currentTurn = lastPlayed === "blue" ? "white" : "blue";
     return <>
         {
             started ?
                 <div className="flex justify-center items-center bg-black h-screen">
                     <div>
-                        <Board />
+                        <Board whitePosition={whitePosition} bluePosition={bluePosition} />
 
                     </div>
-                    <div className="ml-10">
-                        <div className="bg-red text-white text-9xl flex items-center justify-center">
+
+                    {!winner && <div className="ml-10 ">
+                        <div className={`${color === "white" ? "text-white" : "text-blue-500"} font-bold flex justify-center items-center`}>
+                            You are {color}
+                        </div>
+                        <div className=" text-white text-9xl flex items-center justify-center">
                             {diceFace}
                         </div>
                         <button
-                            disabled={notYourTurn}
-                            onClick={handleDiceClick} className={`bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded`}>
+                            disabled={!yourTurn}
+                            onClick={handleDiceClick} className={`${!yourTurn ? "cursor-not-allowed bg-blue-500 opacity-50" : "bg-blue-500 hover:border-blue-500  border-blue-700"} text-white font-bold py-2 px-4 border-b-4  rounded mt-5`}>
 
                             Roll the dice
                         </button>
+                        <div className="text-white flex items-center justify-center">
+                            Turn: {currentTurn}
+                        </div>
+
+                    </div>}
+
+                    {winner && <div className="ml-10">
+                        <div className=" text-white text-9xl flex items-center justify-center">
+                            {winner === color ? "😏" : "😒"}
+                        </div>
+                        <div className="text-white flex items-center justify-center mt-6">
+                            {winner === color ? "You won!!" : "You suck at this. You lost"}
+                        </div>
 
                     </div>
+
+                    }
                 </div>
                 : (
                     <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4 min-h-screen p-6 bg-gradient-to-r from-orange-300 to-orange-600">
                         {/* Left - Image Section */}
                         <div className="p-4 rounded-2xl shadow-lg bg-yellow-300">
-                            <img src={Image} className="w-full h-full object-cover rounded-2xl border-4 border-yellow-400" alt="Snakes and Ladders" />
+                            <img src={Image} className="w-full h-full object-cover rounded-2xl border-4 border-yellow-500" alt="Snakes and Ladders" />
                         </div>
 
                         {/* Right - Play Now Section */}

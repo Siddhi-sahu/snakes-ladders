@@ -109,7 +109,7 @@ export class Game {
                         }
                     }));
                     console.log("return from overflow")
-                    return;
+
                 }
 
                 this.moves = this.moves + 1;
@@ -162,6 +162,8 @@ export class Game {
                         }
                     }));
 
+                    return;
+
                 } else {
                     //position should not update here
 
@@ -181,7 +183,7 @@ export class Game {
                             position: this.bluePosition
                         }
                     }));
-                    return;
+
                 }
 
                 this.moves = this.moves + 1;

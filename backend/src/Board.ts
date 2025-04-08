@@ -3,7 +3,6 @@
 //     num
 // }
 const LADDERS: Record<number, number> = {
-    1: 38,
     4: 14,
     9: 31,
     21: 42,
@@ -15,12 +14,12 @@ const LADDERS: Record<number, number> = {
 }
 const SNAKES: Record<number, number> = {
     16: 6,
-    49: 11,
-    62: 19,
-    65: 53,
-    87: 24,
-    95: 75,
-    98: 78
+    // 49: 11,
+    // 62: 19,
+    // 65: 53,
+    // 87: 24,
+    // 95: 75,
+    // 98: 78
 }
 
 //class or function
