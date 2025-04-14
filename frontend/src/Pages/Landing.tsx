@@ -198,12 +198,15 @@ export const Landing = () => {
 
         {started ? (
             <div className="flex justify-center items-center bg-gradient-to-b from-green-900 via-green-800 to-amber-900 min-h-screen p-6">
-                {/* Decorative elements with subtle floating animation */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                    <div className="absolute top-10 left-10 text-4xl float-animation">🌼</div>
+                    <div className="absolute top-20 right-20 text-4xl float-animation-delay">🌿</div>
                     <div className="absolute top-10 left-10 text-4xl float-animation">🌼</div>
                     <div className="absolute top-20 right-20 text-4xl float-animation-delay">🌿</div>
                     <div className="absolute bottom-10 left-32 text-4xl float-animation">🌼</div>
                     <div className="absolute bottom-40 right-10 text-4xl float-animation-delay">🌿</div>
+                    <div className="absolute top-64 left-1/4 text-4xl float-animation">🌿</div>
+                    <div className="absolute bottom-20 right-1/4 text-4xl float-animation-delay">🌼</div>
                     <div className="absolute top-64 left-1/4 text-4xl float-animation">🌿</div>
                     <div className="absolute bottom-20 right-1/4 text-4xl float-animation-delay">🌼</div>
                 </div>
