@@ -1,0 +1,10 @@
+set up ws server [✅]
+inmemory games objects with multiple games []
+  gameManger manages all the games[✅]
+  managing pending user logic => one user connects is pending user and when other user does as well the game starts[✅]
+  assign different colors[✅]
+  manageMoves[✅]
+  board logic[✅]
+
+frontend[]
+  
