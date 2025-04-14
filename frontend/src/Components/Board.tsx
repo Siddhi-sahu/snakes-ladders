@@ -9,12 +9,30 @@ type BoardProps = {
 export const Board = ({ whitePosition, bluePosition }: BoardProps) => {
     const [whiteToken, setWhiteToken] = useState(1);
     const [blueToken, setBlueToken] = useState(1);
+    const [whiteMoving, setWhiteMoving] = useState(false);
+    const [blueMoving, setBlueMoving] = useState(false);
 
     useEffect(() => {
-        setWhiteToken(whitePosition);
-        setBlueToken(bluePosition)
+        if (whitePosition !== whiteToken) {
+            setWhiteMoving(true);
+            const timer = setTimeout(() => {
+                setWhiteToken(whitePosition);
+                setWhiteMoving(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [whitePosition, whiteToken]);
 
-    }, [whitePosition, bluePosition])
+    useEffect(() => {
+        if (bluePosition !== blueToken) {
+            setBlueMoving(true);
+            const timer = setTimeout(() => {
+                setBlueToken(bluePosition);
+                setBlueMoving(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [bluePosition, blueToken]);
     const LADDERS: Record<number, number> = {
         4: 14,
         9: 31,
@@ -49,37 +67,102 @@ export const Board = ({ whitePosition, bluePosition }: BoardProps) => {
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     ];
 
-
-    return <div className="flex justify-center items-center  border-b-2">
-
-        <div className="bg-black mt-1.5 ">
-            <div>
-
-                {board.map((row, index) => (
-                    //rows
-                    <div className="flex justify-center items-center border-l-2 border-t-2  " key={index}>
-
-                        {row.map((cell, index) =>
-                            //individual cols
-                            <div key={index} className={` flex  justify-center items-center border-r-2 w-16 h-16 ${cell % 2 === 0 ? "bg-yellow-500" : "bg-pink-500"}`} >
-                                <div className="text-white font-bold">
-                                    {LADDERS[cell] ? "🪜" : SNAKES[cell] ? "🐍" : cell}
-                                    {whiteToken === cell ? "⚪" : ""}
-                                    {blueToken === cell ? "🔵" : ""}
-                                </div>
-
-                            </div>)}
+    const renderToken = (cell: number) => {
+        return (
+            <>
+                {whiteToken === cell && (
+                    <div className={`absolute w-8 h-8 rounded-full bg-gradient-to-r from-white to-gray-200 border-2 border-gray-300 shadow-lg z-20 flex items-center justify-center transition-all duration-300 ${whiteMoving ? 'scale-110' : 'scale-100'}`}>
+                        <div className="w-4 h-4 rounded-full bg-gray-300 transition-all duration-300"></div>
                     </div>
+                )}
+                {blueToken === cell && (
+                    <div className={`absolute w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 border-2 border-blue-700 shadow-lg z-20 flex items-center justify-center transition-all duration-300 ${blueMoving ? 'scale-110' : 'scale-100'}`}>
+                        <div className="w-4 h-4 rounded-full bg-blue-300 transition-all duration-300"></div>
+                    </div>
+                )}
+            </>
+        );
+    };
 
-                ))}
+    // const renderLadder = (cell: number) => {
+    //     if (!LADDERS[cell]) return null;
 
+    //     return (
+    //         <div className="absolute inset-0 flex justify-center items-center overflow-hidden">
+    //             <div className="relative w-12 h-10">
+    //                 {/* Main ladder structure with gradient and subtle animation */}
+    //                 <div className="absolute w-6 h-10 bg-gradient-to-b from-amber-600 to-amber-400 rounded-md opacity-80 transition-colors duration-1000 hover:from-amber-500 hover:to-amber-300"></div>
+
+    //                 {/* Ladder rungs with subtle hover effect */}
+    //                 <div className="absolute w-8 h-1.5 bg-amber-300 top-2 rounded-full transform -translate-x-1/2 left-1/2 transition-all duration-500 hover:bg-amber-200"></div>
+    //                 <div className="absolute w-8 h-1.5 bg-amber-300 top-6 rounded-full transform -translate-x-1/2 left-1/2 transition-all duration-500 hover:bg-amber-200"></div>
+    //             </div>
+    //         </div>
+    //     );
+    // };
+
+    // const renderSnake = (cell: number) => {
+    //     if (!SNAKES[cell]) return null;
+
+    //     return (
+    //         <div className="absolute inset-0 flex justify-center items-center overflow-hidden">
+    //             {/* <div className="relative w-12 h-12 group"> */}
+    //             🐍
+    //             {/* </div> */}
+    //         </div>
+    //     );
+    // };
+
+    const getCellHighlightClass = (cell: number) => {
+
+        if (cell === 1) return "hover:bg-green-100 transition-colors duration-300";
+        if (cell === 100) return "hover:bg-yellow-300 transition-colors duration-300";
+
+
+        if (LADDERS[cell]) return "hover:bg-amber-300 transition-colors duration-300";
+        if (SNAKES[cell]) return "hover:bg-red-100 transition-colors duration-300";
+
+        return "hover:opacity-90 transition-opacity duration-300";
+    };
+
+
+    return (
+        <div className="flex justify-center items-center">
+            <div className="relative rounded-lg overflow-hidden shadow-2xl border-4 border-yellow-600">
+                <div className="bg-gradient-to-br from-amber-100 to-amber-300">
+                    {board.map((row, rowIndex) => (
+                        <div className="flex" key={rowIndex}>
+                            {row.map((cell, cellIndex) => {
+                                const isEven = cell % 2 === 0;
+
+                                return (
+                                    <div
+                                        key={cellIndex}
+                                        className={`relative flex justify-center items-center w-16 h-16 
+                                         ${isEven ? "bg-gradient-to-br from-amber-400 to-amber-500" : "bg-gradient-to-br from-white to-amber-100"
+                                            }
+                                   ${cell === 100 ? "bg-gradient-radial from-yellow-300 to-yellow-500" : ""}
+                                  ${getCellHighlightClass(cell)}
+                                border border-amber-700 transition-all duration-300`}
+                                    >
+
+
+
+                                        {LADDERS[cell] ? "🪜" : SNAKES[cell] ? "🐍" : <span className={`text-xl font-bold ${isEven ? "text-amber-900" : "text-amber-800"} transition-all duration-300`}>
+                                            {cell}
+                                        </span>}
+
+
+                                        <div className="absolute inset-0 flex justify-center items-center">
+                                            {renderToken(cell)}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
             </div>
-
-
         </div>
-        {/* <div className="flex bg-white m-1">
-            dice
-
-        </div> */}
-    </div>
-}
+    );
+};
