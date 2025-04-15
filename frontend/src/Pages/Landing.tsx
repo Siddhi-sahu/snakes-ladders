@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import Image from "../assets/snake-and-ladders-multiplayer.webp";
 import { useSocket } from "../hooks/Socket";
 import { Board } from "../Components/Board";
-import snake from "../assets/snake.svg";
-import ladder from "../assets/ladder.svg"
+
 
 export const INIT_GAME = "init_game";
 export const DICE = "dice";
