@@ -167,7 +167,7 @@ export const Landing = () => {
                     Finding players...
                 </div>
                 <div className="text-green-800 text-lg px-4 py-2 bg-yellow-100 bg-opacity-50 rounded-lg shadow-inner">
-                    <span className="inline-block">Open in two tabs to simulate two players</span>
+                    <span className="inline-block">Open in two tabs to simulate two players and restart again</span>
                 </div>
             </div>
         );
